@@ -16,6 +16,7 @@ export default class RouletteGame {
   }
   play(playerColorName, betAmount) {
     if (!this.isValid(playerColorName, betAmount)) return '';
+
     const computerColor = this.makeComputerColor();
     if (this.isSameColorNames(playerColorName, computerColor.name)) this.processWin(betAmount, computerColor.multiplier);
     else this.processLoss(betAmount);
@@ -36,11 +37,13 @@ export default class RouletteGame {
     if (colorName1 === colorName2) return true;
     return false;
   }
-  processWin(betAmount, multiplier) {
-    this.money += betAmount + betAmount * multiplier;
-  }
-  processLoss(betAmount) {
+  placeBet(betAmount) {
+    //베팅 시 베팅 금액은 자금에서 차감된다.
     this.money -= betAmount;
+  }
+  processWin(betAmount, multiplier) {
+    //베팅 성공: 베팅 금액 + (베팅 금액 × 배당)을 획득한다. (원금 회수 + 배당금)
+    this.money += betAmount + betAmount * multiplier;
   }
   makeComputerColor() {
     const randomNumber = Math.floor(Math.random() * 1000) + 1;
