@@ -20,7 +20,6 @@ export default class RouletteGame {
     this.adjustMoney(moneyChange); //베팅 시 베팅 금액은 자금에서 차감된다.
     gameView.updateMoneyElement(this.money);
     gameView.updateResultElement('룰렛을 돌리는 중...');
-    //2초대기
 
     this.addRound();
     let isWin = false;
@@ -59,9 +58,6 @@ export default class RouletteGame {
   }
   addRound() {
     this.round++;
-  }
-  async delayTime(time) {
-    await delay(time);
   }
   isSameColorNames(colorName1, colorName2) {
     if (colorName1 === colorName2) return true;
@@ -134,5 +130,7 @@ function handleBet() {
   const playerColorName = colorSelectInput.value;
   const betAmount = Number(betAmountInput.value);
   const gameResult = game.play(playerColorName, betAmount);
-  gameView.updatePlayView(gameResult);
+  setTimeout(() => {
+    gameView.updatePlayView(gameResult);
+  }, 2000);
 }
