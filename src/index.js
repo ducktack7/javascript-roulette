@@ -16,18 +16,30 @@ export default class RouletteGame {
   }
   play(playerColorName, betAmount) {
     if (!this.isValid(playerColorName, betAmount)) return '';
-    this.placeBet(betAmount);
-    this.addRound();
+    let moneyChange = -1 * betAmount;
+    this.adjustMoney(moneyChange); //베팅 시 베팅 금액은 자금에서 차감된다.
+    gameView.updateMoneyElement(this.money);
+    gameView.updateResultElement('룰렛을 돌리는 중...');
+    //2초대기
 
+    this.addRound();
+    let isWin = false;
     const computerColor = this.makeComputerColor();
-    if (this.isSameColorNames(playerColorName, computerColor.name))
+    if (this.isSameColorNames(playerColorName, computerColor.name)) {
       //룰렛 결과가 플레이어가 선택한 색상과 같으면 베팅 성공, 다르면 베팅 실패이다.
-      this.processWin(betAmount, computerColor.multiplier);
+      isWin = true;
+      moneyChange = this.calculateWinning(betAmount, computerColor.multiplier);
+      this.adjustMoney(moneyChange);
+    }
+    const resultMessage = this.makeResultMessage(computerColor.name, isWin, moneyChange);
 
     return {
       money: this.money,
       round: this.round,
-      resultMessage: '',
+      result: resultMessage,
+      moneyChange: moneyChange,
+      isWin: isWin,
+      isGameOver: this.money <= 0,
     };
   }
   isValid(color, betAmount) {
@@ -42,20 +54,25 @@ export default class RouletteGame {
     }
     return true;
   }
-  placeBet(betAmount) {
-    //베팅 시 베팅 금액은 자금에서 차감된다.
-    this.money -= betAmount;
+  adjustMoney(betAmount) {
+    this.money += betAmount;
   }
   addRound() {
     this.round++;
+  }
+  async delayTime(time) {
+    await delay(time);
   }
   isSameColorNames(colorName1, colorName2) {
     if (colorName1 === colorName2) return true;
     return false;
   }
-  processWin(betAmount, multiplier) {
+  calculateWinning(betAmount, multiplier) {
     //베팅 성공: 베팅 금액 + (베팅 금액 × 배당)을 획득한다. (원금 회수 + 배당금)
-    this.money += betAmount + betAmount * multiplier;
+    return betAmount + betAmount * multiplier;
+  }
+  addWinnings(winnings) {
+    this.money += winnings;
   }
   makeComputerColor() {
     const randomNumber = Math.floor(Math.random() * 1000) + 1;
@@ -68,6 +85,13 @@ export default class RouletteGame {
       if (number <= accumulatedProbability) return color;
     }
   }
+  makeResultMessage(colorName, isWin, moneyChange) {
+    let resultMessage = `룰렛 결과: ${colorName}\n`;
+    if (isWin) resultMessage += `베팅 성공! +`;
+    else resultMessage += `베팅 실패! `;
+    resultMessage += `${moneyChange}원`;
+    return resultMessage;
+  }
 }
 export class RouletteGameView {
   constructor() {
@@ -76,9 +100,20 @@ export class RouletteGameView {
     this.resultContent = document.getElementById('result-content');
   }
   updatePlayView(gameResult) {
-    this.moneyElement.textContent = gameResult.money;
+    this.updateMoneyElement(gameResult.money);
     this.roundElement.textContent = gameResult.round;
-    this.resultContent.textContent = gameResult.resultMessage;
+    this.updateResultElement(gameResult.result);
+  }
+  updateMoneyElement(money) {
+    this.moneyElement.textContent = money;
+  }
+  updateResultElement(message) {
+    this.resultContent.textContent = message;
+  }
+  displayButton(button, isDisplay) {
+    if (isDisplay === true) button.style.display = 'block';
+    else button.style.display = 'none';
+    return;
   }
 }
 
@@ -91,6 +126,7 @@ const restartButton = document.getElementById('restart-button');
 const game = new RouletteGame();
 const gameView = new RouletteGameView();
 
+gameView.displayButton(restartButton, false); //다시 시작 버튼은 보이지 않는다.
 betButton.addEventListener('click', handleBet);
 
 function handleBet() {
