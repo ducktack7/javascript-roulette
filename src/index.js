@@ -14,8 +14,11 @@ export default class RouletteGame {
     this.money = INITIAL_MONEY;
     this.round = INITIAL_ROUND;
   }
-  play(color, betAmount) {
-    if (!this.isValid(color, betAmount)) return '';
+  play(playerColorName, betAmount) {
+    if (!this.isValid(playerColorName, betAmount)) return '';
+    const computerColor = this.makeComputerColor();
+    if (this.isSameColorNames(playerColorName, computerColor.name)) this.processWin(betAmount, computerColor.multiplier);
+    else this.processLoss(betAmount);
   }
   isValid(color, betAmount) {
     if (color === '') {
@@ -29,6 +32,16 @@ export default class RouletteGame {
     }
     return true;
   }
+  isSameColorNames(colorName1, colorName2) {
+    if (colorName1 === colorName2) return true;
+    return false;
+  }
+  processWin(betAmount, multiplier) {
+    this.money += betAmount + betAmount * multiplier;
+  }
+  processLoss(betAmount) {
+    this.money -= betAmount;
+  }
   makeComputerColor() {
     const randomNumber = Math.floor(Math.random() * 1000) + 1;
     return this.convertNumberToColor(randomNumber);
@@ -37,7 +50,7 @@ export default class RouletteGame {
     let accumulatedProbability = 0;
     for (const color of COLORS) {
       accumulatedProbability += color.probability;
-      if (number <= accumulatedProbability) return color.name;
+      if (number <= accumulatedProbability) return color;
     }
   }
   addRound() {
@@ -60,7 +73,7 @@ betButton.addEventListener('click', handleBet);
 
 function handleBet() {
   //베팅을 진행하면 색상과 베팅 금액을 입력한다.
-  const color = colorSelectInput.value;
+  const playerColorName = colorSelectInput.value;
   const betAmount = Number(betAmountInput.value);
-  game.play(color, betAmount);
+  game.play(playerColorName, betAmount);
 }
