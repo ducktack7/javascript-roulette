@@ -112,9 +112,12 @@ export class RouletteGameView {
     this.resultContent.textContent = message;
   }
   displayButton(button, isDisplay) {
-    if (isDisplay === true) button.style.display = 'block';
+    if (isDisplay) button.style.display = 'block';
     else button.style.display = 'none';
-    return;
+  }
+  disableButton(button, isDisable) {
+    if (isDisable) button.disabled = true;
+    else button.disabled = false;
   }
 }
 
@@ -137,7 +140,11 @@ function handleBet() {
   const gameResult = game.play(playerColorName, betAmount);
 
   if (gameResult.isError) return; //유효하지않은 입력 시 중단
+  gameView.disableButton(betButton, true);
+  gameView.disableButton(stopButton, true);
   setTimeout(() => {
     gameView.updatePlayView(gameResult);
+    gameView.disableButton(betButton, false);
+    gameView.disableButton(stopButton, false);
   }, 2000);
 }
