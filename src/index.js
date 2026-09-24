@@ -15,7 +15,7 @@ export default class RouletteGame {
     this.round = INITIAL_ROUND;
   }
   play(playerColorName, betAmount) {
-    if (!this.isValid(playerColorName, betAmount)) return '';
+    if (!this.isValid(playerColorName, betAmount)) return { isError: true };
     let moneyChange = -1 * betAmount;
     this.adjustMoney(moneyChange); //베팅 시 베팅 금액은 자금에서 차감된다.
     gameView.updateMoneyElement(this.money);
@@ -33,6 +33,7 @@ export default class RouletteGame {
     const resultMessage = this.makeResultMessage(computerColor.name, isWin, moneyChange);
 
     return {
+      isError: false,
       money: this.money,
       round: this.round,
       result: resultMessage,
@@ -42,13 +43,17 @@ export default class RouletteGame {
     };
   }
   isValid(color, betAmount) {
+    //유효하지 않은 입력이 들어오면 alert로 에러 메시지를 표시한다.
     if (color === '') {
+      alert('베팅할 색상을 선택해주세요.');
       return false;
     }
     if (betAmount <= 0) {
+      alert('베팅금액에 1이상의 숫자를 입력해주세요.');
       return false;
     }
     if (this.money < betAmount) {
+      alert('베팅금액이 현재자금을 초과합니다.');
       return false;
     }
     return true;
@@ -130,6 +135,8 @@ function handleBet() {
   const playerColorName = colorSelectInput.value;
   const betAmount = Number(betAmountInput.value);
   const gameResult = game.play(playerColorName, betAmount);
+
+  if (gameResult.isError) return; //유효하지않은 입력 시 중단
   setTimeout(() => {
     gameView.updatePlayView(gameResult);
   }, 2000);
