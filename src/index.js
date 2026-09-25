@@ -76,9 +76,6 @@ export default class RouletteGame {
     //베팅 성공: 베팅 금액 + (베팅 금액 × 배당)을 획득한다. (원금 회수 + 배당금)
     return betAmount + betAmount * multiplier;
   }
-  addWinnings(winnings) {
-    this.money += winnings;
-  }
   makeComputerColor() {
     const randomNumber = Math.floor(Math.random() * 1000) + 1;
     return this.convertNumberToColor(randomNumber);
