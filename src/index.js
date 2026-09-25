@@ -134,7 +134,7 @@ export class RouletteGameView {
     this.updateResultElement(gameResult.result);
   }
   updateMoneyElement(money) {
-    this.moneyElement.textContent = money;
+    this.moneyElement.textContent = money.toLocaleString('ko-KR');
   }
   updateResultElement(message) {
     this.resultContent.textContent = message;
