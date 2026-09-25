@@ -93,12 +93,24 @@ export default class RouletteGame {
     resultMessage += `${moneyChange}원`;
     return resultMessage;
   }
+  resetGame() {
+    this.money = INITIAL_MONEY;
+    this.round = INITIAL_ROUND;
+  }
 }
 export class RouletteGameView {
   constructor() {
     this.moneyElement = document.getElementById('current-money');
     this.roundElement = document.getElementById('current-round');
     this.resultContent = document.getElementById('result-content');
+    this.colorSelectInput = document.getElementById('color-select');
+    this.betAmountInput = document.getElementById('bet-amount');
+  }
+  getInput() {
+    return {
+      playerColorName: this.colorSelectInput.value,
+      betAmount: Number(this.betAmountInput.value),
+    };
   }
   updatePlayView(gameResult) {
     this.updateMoneyElement(gameResult.money);
@@ -119,10 +131,17 @@ export class RouletteGameView {
     if (isDisable) button.disabled = true;
     else button.disabled = false;
   }
+  resetView() {
+    this.colorSelectInput.value = '';
+    this.betAmountInput.value = '';
+    this.updatePlayView({
+      money: game.money,
+      round: this.round,
+      result: '',
+    });
+  }
 }
 
-const colorSelectInput = document.getElementById('color-select');
-const betAmountInput = document.getElementById('bet-amount');
 const betButton = document.getElementById('bet-button');
 const stopButton = document.getElementById('stop-button');
 const restartButton = document.getElementById('restart-button');
@@ -130,21 +149,25 @@ const restartButton = document.getElementById('restart-button');
 const game = new RouletteGame();
 const gameView = new RouletteGameView();
 
-gameView.displayButton(restartButton, false); //다시 시작 버튼은 보이지 않는다.
+//gameView.displayButton(restartButton, false); //다시 시작 버튼은 보이지 않는다.
 betButton.addEventListener('click', handleBet);
+restartButton.addEventListener('click', handleRestart);
 
 function handleBet() {
   //베팅을 진행하면 색상과 베팅 금액을 입력한다.
-  const playerColorName = colorSelectInput.value;
-  const betAmount = Number(betAmountInput.value);
+  const { playerColorName, betAmount } = gameView.getInput();
   const gameResult = game.play(playerColorName, betAmount);
 
   if (gameResult.isError) return; //유효하지않은 입력 시 중단
-  gameView.disableButton(betButton, true);
+  gameView.disableButton(betButton, true); //베팅 버튼과 중단 버튼은 비활성화된다.
   gameView.disableButton(stopButton, true);
   setTimeout(() => {
     gameView.updatePlayView(gameResult);
-    gameView.disableButton(betButton, false);
+    gameView.disableButton(betButton, false); //베팅 버튼과 중단 버튼은 다시 활성화된다.
     gameView.disableButton(stopButton, false);
   }, 2000);
+}
+function handleRestart() {
+  game.resetGame();
+  gameView.resetView();
 }
