@@ -48,6 +48,10 @@ export default class RouletteGame {
       alert('베팅할 색상을 선택해주세요.');
       return false;
     }
+    if (!Number.isInteger(betAmount)) {
+      alert('베팅금액에 정수를 입력해주세요.');
+      return false;
+    }
     if (betAmount <= 0) {
       alert('베팅금액에 1이상의 숫자를 입력해주세요.');
       return false;
