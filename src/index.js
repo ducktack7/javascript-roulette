@@ -11,11 +11,12 @@ const COLORS = [
 
 export default class RouletteGame {
   constructor() {
-    this.money = INITIAL_MONEY.toLocaleString('ko-KR');
+    this.money = INITIAL_MONEY;
     this.round = INITIAL_ROUND;
   }
   play(playerColorName, betAmount) {
     if (!this.isValid(playerColorName, betAmount)) return { isError: true };
+    betAmount = Number(betAmount); //지수표현을 거른 후 숫자로 변환
     let moneyChange = -1 * betAmount;
     this.adjustMoney(moneyChange); //베팅 시 베팅 금액은 자금에서 차감된다.
     gameView.updateMoneyElement(this.money);
@@ -48,12 +49,8 @@ export default class RouletteGame {
       alert('베팅할 색상을 선택해주세요.');
       return false;
     }
-    if (!Number.isInteger(betAmount)) {
-      alert('베팅금액에 정수를 입력해주세요.');
-      return false;
-    }
-    if (betAmount <= 0) {
-      alert('베팅금액에 1이상의 숫자를 입력해주세요.');
+    if (!/^[1-9][0-9]*$/.test(betAmount)) {
+      alert('베팅금액에 1이상의 정수를 입력해주세요.');
       return false;
     }
     if (this.money < betAmount) {
@@ -125,7 +122,7 @@ export class RouletteGameView {
     //사용자 입력을 클래스 내부에 복사
     return {
       playerColorName: this.colorSelectInput.value,
-      betAmount: Number(this.betAmountInput.value),
+      betAmount: this.betAmountInput.value,
     };
   }
   updatePlayView(gameResult) {
@@ -188,7 +185,7 @@ gameView.bindRestartEvent(handleRestart);
 function handleBet() {
   //베팅을 진행하면 색상과 베팅 금액을 입력한다.
   const { playerColorName, betAmount } = gameView.getInput();
-  const gameResult = game.play(playerColorName, betAmount);
+  const gameResult = game.play(playerColorName, betAmount); //betAmount는 문자열로 입력됨
 
   if (gameResult.isError) return; //유효하지않은 입력 시 중단
   gameView.disableGameButton(true); //베팅 버튼과 중단 버튼은 비활성화된다.
