@@ -88,7 +88,7 @@ export default class RouletteGame {
     let resultMessage = `룰렛 결과: ${colorName}\n`;
     if (isWin) resultMessage += `베팅 성공! +`;
     else resultMessage += `베팅 실패! `;
-    resultMessage += `${moneyChange}원`;
+    resultMessage += `${moneyChange.toLocaleString('ko-KR')}원`;
     return resultMessage;
   }
   resetGame() {
@@ -153,7 +153,7 @@ export class RouletteGameView {
     const title = document.createElement('h2');
     title.textContent = '게임 종료';
     const money = document.createElement('p');
-    money.textContent = `최종 자금: ${gameResult.money}원`;
+    money.textContent = `최종 자금: ${gameResult.money.toLocaleString('ko-KR')}원`;
     const round = document.createElement('p');
     round.textContent = `플레이한 라운드: ${gameResult.round}`;
 
