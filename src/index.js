@@ -11,7 +11,7 @@ const COLORS = [
 
 export default class RouletteGame {
   constructor() {
-    this.money = INITIAL_MONEY;
+    this.money = INITIAL_MONEY.toLocaleString('ko-KR');
     this.round = INITIAL_ROUND;
   }
   play(playerColorName, betAmount) {
@@ -134,7 +134,7 @@ export class RouletteGameView {
     this.updateResultElement(gameResult.result);
   }
   updateMoneyElement(money) {
-    this.moneyElement.textContent = money.toLocaleString('ko-KR');
+    this.moneyElement.textContent = money.toLocaleString('ko-KR'); //자릿수 표시
   }
   updateResultElement(message) {
     this.resultContent.textContent = message;
@@ -179,6 +179,7 @@ export class RouletteGameView {
 const game = new RouletteGame();
 const gameView = new RouletteGameView();
 
+gameView.updateMoneyElement(game.money); //현재 자금은 10,000이 표시된다.
 gameView.displayRestartButton(false); //다시 시작 버튼은 보이지 않는다.
 gameView.bindBetEvent(handleBet);
 gameView.bindStopEvent(handleStop);
